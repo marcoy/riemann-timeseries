@@ -1,0 +1,57 @@
+#!/bin/bash
+
+
+RIEMANN_VERSION="0.2.4"
+RIEMANN_DIR="riemann-${RIEMANN_VERSION}"
+RIEMANN="${RIEMANN_DIR}/bin/riemann"
+read -r -d '' RIEMANN_CONF <<EOF
+; -*- mode: clojure; -*-
+; vim: filetype=clojure
+
+(logging/init :file "${RIEMANN_DIR}/riemann.log")
+
+; Listen over TCP (5555), UDP (5555), and websockets (5556)
+(let [host "0.0.0.0"]
+  (tcp-server :host host)
+  (udp-server :host host)
+  (ws-server  :host host))
+
+(let [host "127.0.0.1"]
+  (repl-server :host host))
+
+; Expire old events from the index every 5 seconds.
+(periodically-expire 5)
+
+; Keep events in the index for 5 minutes by default.
+(let [index (default :ttl 300 (update-index (index)))]
+
+  ; Inbound events will be passed to these streams:
+  (streams
+
+    ; Index all events immediately.
+    index
+
+    ; Calculate an overall rate of events.
+    (with {:metric 1 :host nil :state "ok" :service "events/sec"}
+      (rate 5 index))
+
+    ; Log expired events.
+    (expired
+      (fn [event] (info "expired" event)))
+))
+EOF
+
+if [ ! -d "riemann-0.2.4" ]
+then
+    echo "Downloading riemann ..."
+    wget "http://aphyr.com/riemann/riemann-${RIEMANN_VERSION}.tar.bz2"
+    tar xfj "riemann-${RIEMANN_VERSION}.tar.bz2"
+    rm -f "riemann-${RIEMANN_VERSION}.tar.bz2"
+fi
+
+INFLUXDB=$(which influxdb)
+if [ -z "${INFLUXDB}" ]
+then
+    echo "Influxdb is not installed. Quitting..."
+    exit 1
+fi

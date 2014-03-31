@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ -f base ]
+then
+    . base
+else
+    echo "Cannot find 'base'"
+    exit 1
+fi
+
+${INFLUXDB} -config="influxdb/influxdb.conf"

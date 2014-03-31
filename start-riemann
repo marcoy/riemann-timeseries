@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ -f base ]
+then
+    . base
+else
+    echo "Cannot find 'base'"
+    exit 1
+fi
+
+TEMP_CONF=$(mktemp -t 'riemann-conf') || exit 1
+echo "Temp config: ${TEMP_CONF}"
+echo "${RIEMANN_CONF}" > "${TEMP_CONF}"
+
+"${RIEMANN}" "${TEMP_CONF}"
+
+echo "Removing ${TEMP_CONF}..."
+rm -f "${TEMP_CONF}"

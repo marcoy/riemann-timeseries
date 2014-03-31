@@ -2,5 +2,6 @@ influxdb/influxdb.log
 influxdb/influxdb.conf.linux
 influxdb/raft
 influxdb/build
+influxdb/wal
 riemann/riemann-0.2.4/
 riemann/riemann.log

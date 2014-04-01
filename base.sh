@@ -42,3 +42,5 @@ then
         > "${INFLUXDB_DIR}/influxdb.conf.linux"
     INFLUXDB_CONF="${INFLUXDB_DIR}/influxdb.conf.linux"
 fi
+
+UBER_JAR=$(find "riemann-timeseries" -iname "*-standalone.jar")

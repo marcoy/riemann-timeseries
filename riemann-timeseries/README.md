@@ -52,6 +52,12 @@ In your riemann.config, you can define a stream like the following:
       (fn [event] (info "expired" event)))))
 ```
 
+### Create an influxdb database
+Remember to create an influxdb database using the influxdb's admin UI. If you
+are using the above rieman.config, you will need to create a database called
+`riemann`. Then, all the data will be saved to table, `all`, in database
+`riemann`.
+
 ## License
 Copyright © 2014 Marco Yuen
 

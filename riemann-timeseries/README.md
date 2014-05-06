@@ -22,10 +22,35 @@ and run
 lein uberjar
 ```
 
-When that's done. Run `start-influxdb` first, and then run `start-riemann`. You
-can take a look at a look at the `start-riemann` and see how I configure the
+When that's done, run `start-influxdb` first, and then run `start-riemann`. You
+can take a look at a look at the script `start-riemann` and see how I configure the
 classpath, and `riemann/riemann.config` to see how to use the store events into
 Influxdb.
+
+### Riemann config
+In your riemann.config, you can define a stream like the following:
+```
+(let [index (index)
+      ;; Location of influxdb and credential
+      influxdb-client (i/client :db "riemann"
+                                :host "localhost"
+                                :port 8086
+                                :username "root"
+                                :password "root")
+      ;; Table to save the metrics to
+      influxdb-table-name "all"]
+
+  ; Inbound events will be passed to these streams:
+  (streams
+
+    index
+
+    (->Influxdb influxdb-client influxdb-table-name)
+
+    ; Log expired events.
+    (expired
+      (fn [event] (info "expired" event)))))
+```
 
 ## License
 Copyright © 2014 Marco Yuen

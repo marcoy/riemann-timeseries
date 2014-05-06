@@ -8,4 +8,36 @@ else
     exit 1
 fi
 
+
+if [ ! -d "${INFLUXDB_BASE_DIR}" ]
+then
+    mkdir -p "${INFLUXDB_BASE_DIR}"
+
+    echo "Copying influxdb.conf to ${INFLUXDB_BASE_DIR} ..."
+    cp configs/influxdb.conf "${INFLUXDB_BASE_DIR}"
+
+    # On Mac OSX homebrew takes care of installing influxdb
+    if [ -z "${INFLUXDB}" -a "Darwin" = "${OS}" ]
+    then
+        echo "Influxdb is not installed. Quitting..."
+        echo "Try installing using 'brew install influxdb'"
+        exit 1
+    fi
+
+    # But on Linux, I have to do it manually
+    if [ -z "${INFLUXDB}" -a "Linux" = "${OS}" ]
+    then
+        echo "Downloading influxdb ..."
+        wget "http://s3.amazonaws.com/influxdb/influxdb-${INFLUXDB_VERSION}.amd64.tar.gz"
+        echo "Extracting influxdb-${INFLUXDB_VERSION}.tar.bz2 ..."
+        tar zxf "influxdb-${INFLUXDB_VERSION}.amd64.tar.gz" -C "influxdb"
+        rm -f "influxdb-${INFLUXDB_VERSION}.amd64.tar.gz"
+        INFLUXDB="${INFLUXDB_BASE_DIR}/build/influxdb"
+        cat "${INFLUXDB_CONF}" | sed "s@assets.*@assets = \"$(pwd)/${INFLUXDB_DIR}/build/admin\"@" \
+            > "${INFLUXDB_DIR}/influxdb.conf.linux"
+        INFLUXDB_CONF="${INFLUXDB_DIR}/influxdb.conf.linux"
+    fi
+fi
+
+
 ${INFLUXDB} -config="${INFLUXDB_CONF}"

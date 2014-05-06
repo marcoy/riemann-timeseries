@@ -8,5 +8,17 @@ else
     exit 1
 fi
 
+if [ ! -d "${RIEMANN_BASE_DIR}/riemann-${RIEMANN_VERSION}" ]
+then
+    mkdir -p ${RIEMANN_BASE_DIR}
+    echo "Downloading riemann ..."
+    wget "http://aphyr.com/riemann/riemann-${RIEMANN_VERSION}.tar.bz2"
+    echo "Extracting riemann-${RIEMANN_VERSION}.tar.bz2"
+    tar xfj "riemann-${RIEMANN_VERSION}.tar.bz2" -C "${RIEMANN_BASE_DIR}"
+    rm -f "riemann-${RIEMANN_VERSION}.tar.bz2"
+    echo "Copying riemann.config to ${RIEMANN_BASE_DIR}"
+    cp configs/riemann.config ${RIEMANN_BASE_DIR}
+fi
+
 java -cp "${RIEMANN_DIR}/lib/riemann.jar":"${UBER_JAR}" \
      riemann.bin "${RIEMANN_CONF}"

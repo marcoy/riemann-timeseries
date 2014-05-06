@@ -9,7 +9,7 @@
 (defmethod convert java.lang.String [s] s)
 (defmethod convert clojure.lang.Keyword [k] (name k))
 (defmethod convert java.util.List [xs] (clojure.string/join "," (map str xs)))
-(defmethod convert java.util.Map [m] (pr-str m))
+(defmethod convert :default [x] (pr-str x))
 
 
 (defn sanitize

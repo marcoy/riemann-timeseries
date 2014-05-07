@@ -10,7 +10,7 @@ RIEMANN="${RIEMANN_DIR}/bin/riemann"
 RIEMANN_CONF="${RIEMANN_BASE_DIR}/riemann.config"
 
 
-INFLUXDB_VERSION="0.6.0"
+INFLUXDB_VERSION="0.6.1"
 INFLUXDB_BUILD_DIR="influxdb/build"
 INFLUXDB=$(which influxdb 2> /dev/null)
 INFLUXDB_BASE_DIR="influxdb"
